@@ -1,0 +1,10 @@
+import pytest
+import sys, os
+sys.path.append(os.path.join(sys.path[0],'src'))
+from Model import Model
+ 
+def test_llmReplyFound():
+    model = Model()
+    prompt = "Name the provinces of Canada"
+    reply = model.getPromptReply(prompt)
+    assert "Ontario" in reply
