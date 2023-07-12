@@ -2,10 +2,7 @@ import torch
 import gc
 from peft import PeftModel
 from transformers import GenerationConfig, LlamaForCausalLM, LlamaTokenizer
-import transformers
 import logging
-import os
-import huggingface_hub
 
 from prompter import Prompter
 
@@ -67,7 +64,6 @@ class Model:
     ):
         prompt = self.prompter.generate_prompt(instruction, input)
         inputs = self.tokenizer(prompt, return_tensors="pt")
-    #    self.model.to('cuda')
         input_ids = inputs["input_ids"].to(self.device)
         gc.collect()
         torch.cuda.empty_cache()
@@ -83,7 +79,7 @@ class Model:
         # Without streaming
         with torch.no_grad():
             generation_output = self.model.generate(
-                input_ids=input_ids,#.to('cuda'),
+                input_ids=input_ids,
                 generation_config=generation_config,
                 return_dict_in_generate=True,
                 output_scores=True,
@@ -110,25 +106,3 @@ class Model:
         logging.info('maximum CUDA memory allocated is: {:6.0f}'.format(torch.cuda.max_memory_allocated() / 1024**2), 'MB') # Returns the maximum GPU memory occupied by tensors in bytes for a given device.
         logging.info('total CUDA memory reserved is: {:6.0f}' .format(torch.cuda.memory_reserved()  / 1024**2), 'MB')  # Returns the current GPU memory managed by the caching allocator in bytes for a given device.
         logging.info('maximum CUDA memory reserved is: {:6.0f}' .format(torch.cuda.max_memory_reserved()  / 1024**2), 'MB') # Returns the maximum GPU memory managed by the caching allocator in bytes for a given device.
-
-'''
-    def loadModelForDevice(self, device):
-        device_map = "auto" if(device=="cuda") else device
-        logging.info('Loading base model, device = ' + str(device))
-        self.model = LlamaForCausalLM.from_pretrained(
-            self.base_model,
-            #load_in_8bit = False,
-            #llm_int8_enable_fp32_cpu_offload = True,
-            torch_dtype = torch.float16,
-            device_map = device_map
-        )
-        logging.info('Loading base model, device = ' + str(device) + " -- Complete")
-        logging.info('Loading lora weights, device = ' + str(device))
-        self.model = PeftModel.from_pretrained(
-            self.model,
-            self.lora_weights,
-            torch_dtype = torch.float16,
-            device_map = device_map
-        )
-        logging.info('Loading lora weights, device = ' + str(device) + " -- Complete")
-'''
