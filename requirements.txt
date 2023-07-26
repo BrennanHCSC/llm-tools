@@ -1,10 +1,10 @@
+pytest==7.4.0
 wheel==0.40.0
-pytest==7.2.1
 PyPDF2==3.0.1
 pytesseract==0.3.10
 Pillow==9.4.0
 transformers==4.28.1
 peft==0.3.0
-torch==2.0.0
 sentencepiece==0.1.98
 sympy==1.11.1
+torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118
